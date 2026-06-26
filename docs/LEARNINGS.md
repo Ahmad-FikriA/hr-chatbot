@@ -1,9 +1,5 @@
 # What I Learned Building ResBot — a Bilingual AI HR Assistant
 
-> A first-person write-up of the concepts behind this project. Feel free to edit it into your
-> own voice before posting. Two versions below: a **portfolio long-form** and a **short LinkedIn
-> caption**.
-
 ---
 
 
