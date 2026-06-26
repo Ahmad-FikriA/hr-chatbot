@@ -6,7 +6,6 @@
 
 ---
 
-## Long-form (portfolio / blog)
 
 I set out to understand how AI assistants like the ones bolted onto every product actually work
 under the hood — not by reading about them, but by building one. The result is **ResBot**, a
@@ -75,30 +74,3 @@ an OpenAI-compatible LLM API, and an in-memory vector store I wrote myself.
 
 ---
 
-## Short version (LinkedIn caption)
-
-I just built **ResBot** — a bilingual (🇬🇧/🇮🇩) AI HR assistant — to actually understand how
-"AI that knows your documents" works. Turns out it's **RAG**, and it's less magic than I thought:
-
-🔹 Turn text into **embeddings** (vectors that capture meaning)
-🔹 Find the closest matches with **cosine similarity** (built it by hand)
-🔹 Feed those passages to an LLM with strict instructions to answer **only** from them
-
-The bits that surprised me weren't the AI — they were the engineering around it:
-✅ **Grounding** so it cites sources instead of hallucinating
-✅ **Guardrails** that escalate sensitive topics (harassment, legal, mental health) to a human
-✅ A **multilingual embedding model** so it answers in English *or* Bahasa Indonesia
-✅ Handling rate limits, retries, and keeping the API key off the frontend
-
-Biggest lesson: a good assistant is defined as much by what it *refuses* to answer as by what it
-gets right.
-
-Built with React, Node/Express, transformers.js, and a vector store I wrote from scratch.
-
-#AI #RAG #MachineLearning #WebDevelopment #LLM #BuildInPublic
-
----
-
-> _Optional, your call:_ if you value transparency, you might add a line noting you built this as a
-> guided learning project with AI pair-programming — it's a genuine strength to show you can learn
-> fast *and* work alongside AI tools.
