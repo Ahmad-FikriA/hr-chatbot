@@ -1,0 +1,33 @@
+# Postgres 18 for ResBot, run via Docker (OrbStack).
+#
+#   docker compose up -d      # start it in the background
+#   docker compose ps         # check it's running
+#   docker compose logs db     # see its logs
+#   docker compose down        # stop it (data is kept in the volume)
+#
+# Host port 5433 -> container 5432, so it does NOT clash with a native
+# Postgres already listening on 5432. The app connects to localhost:5433.
+
+services:
+  db:
+    image: postgres:18
+    container_name: resbot-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: resbot
+      POSTGRES_PASSWORD: resbot_dev
+      POSTGRES_DB: resbot
+    ports:
+      - "5433:5432"
+    volumes:
+      # Postgres 18 stores data in a version-specific subdir, so the volume is
+      # mounted at the parent (/var/lib/postgresql), not /var/lib/postgresql/data.
+      - resbot_pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U resbot -d resbot"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+
+volumes:
+  resbot_pgdata:
