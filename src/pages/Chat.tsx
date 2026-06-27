@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { askBot } from '../api/client'
 import { ChatMessage, type Message } from '../components/ChatMessage'
+import { useAuth } from '../auth/AuthContext'
 
 const SUGGESTIONS = [
   'How many days of annual leave do I get?',
@@ -10,6 +11,7 @@ const SUGGESTIONS = [
 ]
 
 export function Chat() {
+  const { user, logout } = useAuth()
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -55,13 +57,15 @@ export function Chat() {
     <div className="app">
       <header className="topbar">
         <div className="brand">
-
           <div className="brand-text">
             <span className="brand-name">ResBot</span>
             <span className="brand-sub">HR Resource Bot</span>
           </div>
         </div>
-
+        <div className="topbar-right">
+          <span className="user-name">{user?.name || user?.email}</span>
+          <button className="logout-btn" onClick={() => logout()}>Log out</button>
+        </div>
       </header>
 
       <main className="scroll" ref={scrollRef}>
