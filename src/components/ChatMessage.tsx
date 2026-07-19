@@ -23,13 +23,23 @@ function prettySource(file: string): string {
     .join(' ')
 }
 
-export function ChatMessage({ message }: { message: Message }) {
+function parseInlineMarkdown(text: string) {
+  const parts = text.split('**')
+  return parts.map((part, index) => {
+    if (index % 2 === 1) {
+      return <strong key={index}>{part}</strong>
+    }
+    return part
+  })
+}
+
+export function ChatMessage({ message, onSelectSource }: { message: Message; onSelectSource?: (source: string) => void }) {
   const { role, text, sources, status } = message
 
   if (role === 'user') {
     return (
       <div className="row row-user">
-        <div className="bubble bubble-user">{text}</div>
+        <div className="bubble bubble-user">{parseInlineMarkdown(text)}</div>
       </div>
     )
   }
@@ -48,15 +58,21 @@ export function ChatMessage({ message }: { message: Message }) {
         <span>RB</span>
       </div>
       <div className="bot-stack">
-        <div className={bubbleClass}>{text}</div>
+        <div className={bubbleClass}>{parseInlineMarkdown(text)}</div>
         {tag && <span className={tag.className}>{tag.label}</span>}
         {status === 'answered' && sources && sources.length > 0 && (
           <div className="sources">
             <span className="sources-label">Source</span>
             {sources.map((s) => (
-              <span key={s} className="chip">
+              <button
+                key={s}
+                className="chip chip-btn"
+                onClick={() => onSelectSource?.(s)}
+                title={`Preview ${prettySource(s)}`}
+                type="button"
+              >
                 {prettySource(s)}
-              </span>
+              </button>
             ))}
           </div>
         )}

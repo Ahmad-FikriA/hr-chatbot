@@ -50,3 +50,9 @@ export async function getMe(): Promise<User | null> {
     return null
   }
 }
+
+export const getDocs = () =>
+  request<string[]>('/api/docs')
+
+export const getDoc = (filename: string) =>
+  request<{ filename: string; content: string }>(`/api/docs/${encodeURIComponent(filename)}`)
