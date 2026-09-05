@@ -51,8 +51,72 @@ export async function getMe(): Promise<User | null> {
   }
 }
 
-export const getDocs = () =>
-  request<string[]>('/api/docs')
+export interface DocItem {
+  filename: string
+  name: string
+  file_type: string
+  equipment: string
+}
 
-export const getDoc = (filename: string) =>
-  request<{ filename: string; content: string }>(`/api/docs/${encodeURIComponent(filename)}`)
+export interface DocContent {
+  filename: string
+  name: string
+  file_type: string
+  content: string
+  equipment: string
+  total_pages?: number
+}
+
+export const getDocs = () =>
+  request<DocItem[]>('/api/docs')
+
+export const getDoc = (filepath: string) =>
+  request<DocContent>(`/api/docs/${filepath.split('/').map(encodeURIComponent).join('/')}`)
+
+export const getFileUrl = (filepath: string) =>
+  `/api/files/${filepath.split('/').map(encodeURIComponent).join('/')}`
+
+export const getPdfPageUrl = (filepath: string, page: number = 1, dpi: number = 150) =>
+  `/api/pdf-page/${filepath.split('/').map(encodeURIComponent).join('/')}?page=${page}&dpi=${dpi}`
+
+export interface UploadedDoc {
+  filename: string
+  name: string
+  file_type: string
+  equipment: string
+  size_bytes?: number
+  chunk_count?: number
+}
+
+/** Upload a single file to the user's personal knowledge store. */
+export async function uploadFile(file: File): Promise<UploadedDoc> {
+  const formData = new FormData()
+  formData.append('file', file)
+  const res = await fetch('/api/upload', {
+    method: 'POST',
+    credentials: 'include',
+    body: formData,
+  })
+  if (!res.ok) {
+    const body = (await res.json().catch(() => null)) as { detail?: string } | null
+    throw new Error(body?.detail ?? `Upload failed (${res.status})`)
+  }
+  const data = await res.json() as { filename: string; file_type: string; chunk_count: number; size_bytes: number }
+  return {
+    filename: data.filename,
+    name: data.filename,
+    file_type: data.file_type,
+    equipment: 'My Uploads',
+    size_bytes: data.size_bytes,
+    chunk_count: data.chunk_count,
+  }
+}
+
+/** List all files the current user has uploaded in this session. */
+export const getUploadedDocs = () =>
+  request<UploadedDoc[]>('/api/upload')
+
+/** Delete a previously uploaded document by filename. */
+export async function deleteUploadedDoc(filename: string): Promise<void> {
+  await request<{ ok: boolean }>(`/api/upload/${encodeURIComponent(filename)}`, { method: 'DELETE' })
+}

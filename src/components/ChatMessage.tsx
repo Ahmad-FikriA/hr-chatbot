@@ -14,32 +14,58 @@ const STATUS_META: Record<ChatStatus, { label: string; className: string } | nul
   no_answer: { label: 'No match in the handbook', className: 'tag tag-muted' },
 }
 
-// Turn "leave-policy.md" into "Leave Policy" for a friendlier source chip.
+// Turn file paths into a clean friendly source label
 function prettySource(file: string): string {
-  return file
-    .replace(/\.md$/, '')
-    .split(/[-_]/)
-    .map((w) => w.charAt(0).toUpperCase() + w.slice(1))
-    .join(' ')
+  const parts = file.split(/[\\/]/)
+  const basename = parts[parts.length - 1]
+  const cleanName = basename.replace(/\.(md|pdf|xlsx|xls|pptx|png|jpg|jpeg)$/i, '')
+  
+  // Clean up underscores and dashes
+  return cleanName
+    .replace(/^OPL-/, 'OPL: ')
+    .replace(/[-_]+/g, ' ')
+    .trim()
 }
 
-function parseInlineMarkdown(text: string) {
-  const parts = text.split('**')
-  return parts.map((part, index) => {
-    if (index % 2 === 1) {
-      return <strong key={index}>{part}</strong>
-    }
-    return part
-  })
+function getSourceIcon(file: string): string {
+  const ext = file.split('.').pop()?.toLowerCase()
+  switch (ext) {
+    case 'pdf':
+      return '📄'
+    case 'png':
+    case 'jpg':
+    case 'jpeg':
+      return '🖼️'
+    case 'xlsx':
+    case 'xls':
+      return '📊'
+    case 'pptx':
+      return '📑'
+    case 'md':
+    default:
+      return '📝'
+  }
 }
 
-export function ChatMessage({ message, onSelectSource }: { message: Message; onSelectSource?: (source: string) => void }) {
+import { MarkdownView } from './MarkdownView'
+
+export function ChatMessage({
+  message,
+  onSelectSource,
+  onImageClick,
+}: {
+  message: Message
+  onSelectSource?: (source: string) => void
+  onImageClick?: (src: string, alt?: string) => void
+}) {
   const { role, text, sources, status } = message
 
   if (role === 'user') {
     return (
       <div className="row row-user">
-        <div className="bubble bubble-user">{parseInlineMarkdown(text)}</div>
+        <div className="bubble bubble-user">
+          <MarkdownView content={text} className="chat-markdown" onImageClick={onImageClick} />
+        </div>
       </div>
     )
   }
@@ -55,23 +81,26 @@ export function ChatMessage({ message, onSelectSource }: { message: Message; onS
   return (
     <div className="row row-bot">
       <div className="avatar" aria-hidden="true">
-        <span>RB</span>
+        <span>KB</span>
       </div>
       <div className="bot-stack">
-        <div className={bubbleClass}>{parseInlineMarkdown(text)}</div>
+        <div className={bubbleClass}>
+          <MarkdownView content={text} className="chat-markdown" onImageClick={onImageClick} />
+        </div>
         {tag && <span className={tag.className}>{tag.label}</span>}
         {status === 'answered' && sources && sources.length > 0 && (
           <div className="sources">
-            <span className="sources-label">Source</span>
+            <span className="sources-label">Sources:</span>
             {sources.map((s) => (
               <button
                 key={s}
                 className="chip chip-btn"
                 onClick={() => onSelectSource?.(s)}
-                title={`Preview ${prettySource(s)}`}
+                title={`Preview ${s}`}
                 type="button"
               >
-                {prettySource(s)}
+                <span className="chip-icon">{getSourceIcon(s)}</span>
+                <span className="chip-text">{prettySource(s)}</span>
               </button>
             ))}
           </div>
@@ -80,3 +109,5 @@ export function ChatMessage({ message, onSelectSource }: { message: Message; onS
     </div>
   )
 }
+
+

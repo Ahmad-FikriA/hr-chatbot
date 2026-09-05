@@ -546,18 +546,20 @@
 
 /* ============ 3-Pane Layout Sidebar & Drawer ============ */
 .sidebar {
-  width: 260px;
+  width: 280px;
   flex: none;
   background: var(--paper-2);
   border-right: 1px solid var(--line-strong);
   display: flex;
   flex-direction: column;
+  height: 100%;
+  overflow: hidden;
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1), margin-left 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 .sidebar.collapsed {
-  margin-left: -260px;
-  transform: translateX(-260px);
+  margin-left: -280px;
+  transform: translateX(-280px);
 }
 
 .sidebar-title {
@@ -566,14 +568,33 @@
   text-transform: uppercase;
   letter-spacing: 1.8px;
   color: var(--muted);
-  padding: 24px 24px 12px;
+  padding: 8px 4px 4px;
 }
 
 .sidebar-nav {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
   display: flex;
   flex-direction: column;
-  padding: 0 16px;
-  gap: 6px;
+  padding: 8px 12px 24px;
+  gap: 4px;
+  scrollbar-width: thin;
+  scrollbar-color: var(--line-strong) transparent;
+}
+
+.sidebar-nav::-webkit-scrollbar {
+  width: 6px;
+}
+.sidebar-nav::-webkit-scrollbar-track {
+  background: transparent;
+}
+.sidebar-nav::-webkit-scrollbar-thumb {
+  background-color: var(--line-strong);
+  border-radius: 4px;
+}
+.sidebar-nav::-webkit-scrollbar-thumb:hover {
+  background-color: var(--muted);
 }
 
 .sidebar-item {
@@ -805,4 +826,648 @@
     margin-right: 0;
     transform: translateX(360px);
   }
+}
+
+/* ============ Manufacturing Knowledge Hub Additions ============ */
+
+.sidebar-header-search {
+  padding: 16px 16px 10px;
+  border-bottom: 1px solid var(--line);
+}
+
+.sidebar-search-input {
+  width: 100%;
+  padding: 7px 12px;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  font-size: 12.5px;
+  background: var(--paper);
+  color: var(--ink);
+  outline: none;
+  transition: border-color 0.18s ease;
+  margin-top: 8px;
+}
+
+.sidebar-search-input:focus {
+  border-color: var(--plum);
+}
+
+.sidebar-group {
+  margin-bottom: 12px;
+}
+
+.sidebar-group-title {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  padding: 8px 16px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sidebar-group-count {
+  font-size: 10px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  padding: 1px 6px;
+  border-radius: 999px;
+}
+
+.sidebar-empty {
+  padding: 24px 16px;
+  color: var(--muted);
+  font-size: 13px;
+  text-align: center;
+}
+
+.doc-badge {
+  font-size: 9.5px;
+  font-weight: 700;
+  padding: 2px 5px;
+  border-radius: 4px;
+  background: var(--paper);
+  border: 1px solid var(--line-strong);
+  color: var(--muted);
+  margin-left: auto;
+}
+
+.preview-title-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 80%;
+  overflow: hidden;
+}
+
+.preview-icon {
+  font-size: 18px;
+}
+
+.preview-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 24px;
+  background: var(--paper);
+  border-bottom: 1px solid var(--line);
+  font-size: 12px;
+}
+
+.preview-path-badge {
+  font-family: monospace;
+  font-size: 11px;
+  color: var(--muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 60%;
+}
+
+.preview-raw-link {
+  color: var(--plum-deep);
+  font-weight: 600;
+  text-decoration: none;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: var(--plum-soft);
+  border: 1px solid var(--plum-line);
+  transition: all 0.18s ease;
+}
+
+.preview-raw-link:hover {
+  background: var(--plum-deep);
+  color: #fff;
+}
+
+.preview-image-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.preview-image-header {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+}
+
+.preview-image-element {
+  max-width: 100%;
+  height: auto;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow);
+  background: #fff;
+}
+
+.preview-image-caption {
+  font-size: 12px;
+  color: var(--muted);
+  text-align: center;
+  font-style: italic;
+}
+
+/* ============ Markdown Table & Formatting ============ */
+.chat-markdown {
+  font-size: 14.5px;
+  line-height: 1.6;
+  color: inherit;
+}
+
+.chat-markdown p {
+  margin: 0 0 10px;
+}
+.chat-markdown p:last-child {
+  margin-bottom: 0;
+}
+
+.md-table-wrap {
+  width: 100%;
+  overflow-x: auto;
+  margin: 14px 0;
+  border-radius: 8px;
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.md-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+  text-align: left;
+}
+
+.md-table th {
+  background: var(--paper-2);
+  color: var(--ink);
+  font-weight: 700;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--line-strong);
+  white-space: nowrap;
+}
+
+.md-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--line);
+  color: var(--ink-soft);
+}
+
+.md-table tr:last-child td {
+  border-bottom: none;
+}
+
+.md-table tr:hover td {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+.md-link {
+  color: var(--plum-deep);
+  text-decoration: underline;
+}
+
+/* ============ Clickable Image & Overlay ============ */
+.preview-image-clickable-wrapper {
+  position: relative;
+  cursor: pointer;
+  border-radius: 8px;
+  overflow: hidden;
+  display: inline-block;
+  max-width: 100%;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.preview-image-clickable-wrapper:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-lift);
+}
+
+.preview-image-clickable-wrapper:hover .preview-image-overlay {
+  opacity: 1;
+}
+
+.preview-image-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(20, 20, 25, 0.45);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  font-size: 13px;
+  font-weight: 600;
+  backdrop-filter: blur(2px);
+}
+
+.clickable {
+  cursor: pointer;
+}
+
+/* ============ Lightbox Modal & Zoom Controls ============ */
+.lightbox-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background: rgba(10, 10, 15, 0.88);
+  backdrop-filter: blur(8px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.lightbox-container {
+  width: 95vw;
+  height: 92vh;
+  background: var(--surface);
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.lightbox-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 20px;
+  background: var(--paper-2);
+  border-bottom: 1px solid var(--line-strong);
+}
+
+.lightbox-title {
+  font-family: var(--serif);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.lightbox-tools {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.lightbox-btn {
+  background: var(--surface);
+  border: 1px solid var(--line-strong);
+  color: var(--ink);
+  font-size: 13px;
+  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.lightbox-btn:hover {
+  background: var(--plum-soft);
+  border-color: var(--plum-line);
+  color: var(--plum-deep);
+}
+
+.lightbox-link {
+  text-decoration: none;
+}
+
+.lightbox-close {
+  background: rgba(220, 38, 38, 0.1);
+  color: #dc2626;
+  border-color: rgba(220, 38, 38, 0.2);
+}
+
+.lightbox-close:hover {
+  background: #dc2626;
+  color: #fff;
+  border-color: #dc2626;
+}
+
+.lightbox-zoom-text {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--muted);
+  min-width: 42px;
+  text-align: center;
+}
+
+.lightbox-body {
+  flex: 1;
+  overflow: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px;
+  background: #0f1117;
+}
+
+.lightbox-image {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  transition: transform 0.2s cubic-bezier(0.2, 0.8, 0.2, 1);
+  border-radius: 4px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+}
+
+/* ============ PDF Visual Page & CAD Drawing Styles ============ */
+.preview-pdf-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+}
+
+.preview-pdf-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  background: var(--paper-2);
+  border: 1px solid var(--line-strong);
+  border-radius: 10px;
+}
+
+.pdf-view-toggle {
+  display: flex;
+  align-items: center;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 2px;
+  gap: 2px;
+}
+
+.pdf-toggle-btn {
+  border: none;
+  background: transparent;
+  padding: 5px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--muted);
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pdf-toggle-btn.active {
+  background: var(--plum-deep);
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.pdf-toggle-btn:hover:not(.active) {
+  color: var(--ink);
+}
+
+.pdf-page-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pdf-page-btn {
+  border: 1px solid var(--line-strong);
+  background: var(--surface);
+  color: var(--ink);
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  font-size: 11px;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+
+.pdf-page-btn:hover:not(:disabled) {
+  background: var(--plum-soft);
+  color: var(--plum-deep);
+  border-color: var(--plum-line);
+}
+
+.pdf-page-btn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.pdf-page-indicator {
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--ink-soft);
+  padding: 0 4px;
+}
+
+.preview-pdf-visual {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
+.pdf-page-wrapper {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  background: #fff;
+  border: 1px solid var(--line-strong);
+  border-radius: 8px;
+  padding: 8px;
+  box-shadow: var(--shadow-sm);
+}
+
+.pdf-page-img {
+  max-width: 100%;
+  height: auto;
+  object-fit: contain;
+  background: #fff;
+}
+
+
+/* =========================================================
+   Upload Section Styles
+   ========================================================= */
+
+.sidebar-upload-section {
+  border-top: 1px solid var(--line-strong);
+  padding: 14px 12px 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex-shrink: 0;
+}
+
+.sidebar-upload-title {
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--accent);
+  opacity: 0.85;
+}
+
+/* Drop zone */
+.upload-drop-zone {
+  border: 2px dashed var(--line-strong);
+  border-radius: 10px;
+  padding: 14px 10px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  background: rgba(255, 255, 255, 0.02);
+  user-select: none;
+}
+
+.upload-drop-zone:hover:not(.uploading) {
+  border-color: var(--accent);
+  background: rgba(99, 179, 237, 0.06);
+  box-shadow: 0 0 0 3px rgba(99, 179, 237, 0.12);
+}
+
+.upload-drop-zone.drag-active {
+  border-color: var(--accent);
+  background: rgba(99, 179, 237, 0.12);
+  box-shadow: 0 0 0 4px rgba(99, 179, 237, 0.2);
+}
+
+.upload-drop-zone.uploading {
+  cursor: wait;
+  opacity: 0.75;
+}
+
+.upload-drop-inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+  text-align: center;
+}
+
+.upload-drop-icon {
+  font-size: 1.5rem;
+  line-height: 1;
+}
+
+.upload-drop-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.upload-drop-hint {
+  font-size: 0.68rem;
+  color: var(--text-secondary);
+  opacity: 0.8;
+}
+
+/* Upload spinner */
+.upload-spinner {
+  width: 22px;
+  height: 22px;
+  border: 3px solid rgba(99, 179, 237, 0.25);
+  border-top-color: var(--accent);
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+  margin-bottom: 4px;
+}
+
+/* Error message */
+.upload-error-msg {
+  font-size: 0.72rem;
+  color: #fc8181;
+  background: rgba(252, 129, 129, 0.1);
+  border: 1px solid rgba(252, 129, 129, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  line-height: 1.4;
+  word-break: break-word;
+}
+
+/* Uploaded docs list */
+.uploaded-doc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.uploaded-doc-item {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  border-radius: 7px;
+  background: rgba(255, 255, 255, 0.03);
+  transition: background 0.15s ease;
+}
+
+.uploaded-doc-item:hover,
+.uploaded-doc-item.active {
+  background: rgba(99, 179, 237, 0.1);
+}
+
+.uploaded-doc-item.active {
+  outline: 1px solid rgba(99, 179, 237, 0.35);
+}
+
+.uploaded-doc-name {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 6px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-primary);
+  font-size: 0.78rem;
+  text-align: left;
+  min-width: 0;
+  border-radius: 7px;
+}
+
+.uploaded-doc-name .doc-name {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.uploaded-doc-delete {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  padding: 4px 7px;
+  border-radius: 5px;
+  line-height: 1;
+  transition: color 0.15s ease, background 0.15s ease;
+  opacity: 0.6;
+}
+
+.uploaded-doc-delete:hover {
+  color: #fc8181;
+  background: rgba(252, 129, 129, 0.12);
+  opacity: 1;
 }
