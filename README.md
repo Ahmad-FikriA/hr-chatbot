@@ -21,7 +21,7 @@ Answering with clickable source citations — which automatically open the polic
 - **Answers from a real knowledge base.** HR policies live in markdown (and PDFs, spreadsheets, and more); ResBot retrieves the relevant passages and answers from them — no made-up policies.
 - **Bilingual.** Ask in English or Indonesian; it detects the language, retrieves from the matching bilingual content, and replies in kind.
 - **Multi-format document support.** The knowledge base supports `.md`, `.pdf`, `.xlsx`, `.pptx`, and image files (`.png`, `.jpg`). PDFs render page-by-page in a visual preview.
-- **User file uploads.** Employees can upload their own documents (`.md`, `.pdf`, `.xlsx`, `.pptx`) to create a personal, session-scoped knowledge store that blends into their chat answers.
+- **User file uploads.** Employees can upload their own HR documents (`.md`, `.pdf`, `.xlsx`, `.pptx`) to create a personal, session-scoped knowledge store that blends into their chat answers.
 - **Collapsible Handbook & Preview Panel.** Browse policy documents in the left sidebar, or click on a source citation in a chat bubble to slide open a formatted document preview on the right.
 - **Cites its sources.** Every answer shows which handbook document it came from, with clickable chips to open the preview.
 - **Guardrails for sensitive topics.** Questions about harassment, legal action, termination, or mental health are *escalated to a human* — the bot never improvises on those.
@@ -99,7 +99,7 @@ npm run dev                # Start Vite dev server → http://localhost:5173
 
 Open **http://localhost:5173**, click **Register** to create an account, log in, and start chatting!
 
-Try asking: *"Berapa hari cuti tahunan saya?"* or click on the suggested chips. Test a guardrail by asking *"Can you help me sue my manager?"* to see human routing in action. Try uploading a PDF or spreadsheet using the upload button in the sidebar!
+Try asking: *"Berapa hari cuti tahunan saya?"* or click on the suggested chips. Test a guardrail by asking *"Can you help me sue my manager?"* to see human routing in action. Try uploading an HR policy PDF or benefits spreadsheet using the upload button in the sidebar!
 
 ## Project structure
 

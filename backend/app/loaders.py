@@ -1,7 +1,6 @@
 import csv
 import os
-import re
-from typing import List, Optional
+from typing import List
 from langchain_core.documents import Document
 
 try:
@@ -22,13 +21,12 @@ except ImportError:
 SUPPORTED_EXTENSIONS = {".md", ".pdf", ".xlsx", ".xls", ".pptx", ".csv", ".png", ".jpg", ".jpeg"}
 
 
-def extract_equipment_context(rel_path: str) -> Optional[str]:
-    """Extract equipment tag/set name from directory path if present."""
-    parts = rel_path.split(os.sep)
-    for part in parts:
-        if part.startswith("Set_") or re.match(r"^[A-Z]{2}-\d{4}", part):
-            return part
-    return None
+def extract_policy_category(rel_path: str) -> str:
+    """Use the document's parent folder as its HR category."""
+    parent = os.path.dirname(rel_path)
+    if not parent:
+        return "HR Documents"
+    return os.path.basename(parent).replace("_", " ").replace("-", " ").strip() or "HR Documents"
 
 
 def load_pdf(file_path: str, rel_path: str) -> List[Document]:
@@ -39,7 +37,7 @@ def load_pdf(file_path: str, rel_path: str) -> List[Document]:
     docs = []
     doc_fitz = fitz.open(file_path)
     total_pages = len(doc_fitz)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
 
     full_text_pages = []
     for page_num in range(total_pages):
@@ -52,8 +50,8 @@ def load_pdf(file_path: str, rel_path: str) -> List[Document]:
 
     filename = os.path.basename(file_path)
     if not full_text_pages:
-        # Scanned or drawing PDF with no embedded text
-        stub_content = f"# {filename}\nCategory: {equipment or 'General'}\nType: Document / Diagram (PDF Document)\nFile: {rel_path}"
+        # Scanned PDF with no embedded text
+        stub_content = f"# {filename}\nCategory: {category or 'HR Documents'}\nType: PDF document (no extractable text)\nFile: {rel_path}"
         docs.append(
             Document(
                 page_content=stub_content,
@@ -61,16 +59,16 @@ def load_pdf(file_path: str, rel_path: str) -> List[Document]:
                     "source": rel_path,
                     "filename": filename,
                     "file_type": "pdf",
-                    "equipment": equipment or "",
-                    "is_drawing": True,
+                    "category": category or "",
+                    "has_no_extractable_text": True,
                 },
             )
         )
     else:
         # Group text with header
         doc_body = f"# Document: {filename}\n"
-        if equipment:
-            doc_body += f"Category / Tag: {equipment}\n\n"
+        if category:
+            doc_body += f"HR Category: {category}\n\n"
         for pnum, ptext in full_text_pages:
             doc_body += f"--- Page {pnum} of {total_pages} ---\n{ptext}\n\n"
 
@@ -81,7 +79,7 @@ def load_pdf(file_path: str, rel_path: str) -> List[Document]:
                     "source": rel_path,
                     "filename": filename,
                     "file_type": "pdf",
-                    "equipment": equipment or "",
+                    "category": category or "",
                     "pages": total_pages,
                 },
             )
@@ -98,7 +96,7 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
     docs = []
     wb = openpyxl.load_workbook(file_path, data_only=True)
     filename = os.path.basename(file_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
 
     for sheet_name in wb.sheetnames:
         sheet = wb[sheet_name]
@@ -124,7 +122,7 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
                         "filename": filename,
                         "file_type": "xlsx",
                         "sheet": sheet_name,
-                        "equipment": equipment or "",
+                        "category": category or "",
                     },
                 )
             )
@@ -138,8 +136,8 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
             f"Total Rows: {len(data_rows)} data records\n"
             f"Columns ({len(headers)}): {', '.join(headers)}\n"
         )
-        if equipment:
-            overview_content += f"Category / Tag: {equipment}\n"
+        if category:
+            overview_content += f"HR Category: {category}\n"
         docs.append(
             Document(
                 page_content=overview_content.strip(),
@@ -148,7 +146,7 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
                     "filename": filename,
                     "file_type": "xlsx",
                     "sheet": sheet_name,
-                    "equipment": equipment or "",
+                    "category": category or "",
                     "is_overview": True,
                 },
             )
@@ -170,8 +168,8 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
                 header_info = f"# Spreadsheet: {filename} • Sheet: {sheet_name}"
                 if total_chunks > 1:
                     header_info += f" (Part {chunk_idx + 1} of {total_chunks})"
-                if equipment:
-                    header_info += f"\nCategory / Tag: {equipment}"
+                if category:
+                    header_info += f"\nHR Category: {category}"
 
                 content = f"{header_info}\nSource File: {filename}\n\n" + "\n".join(record_lines)
                 docs.append(
@@ -182,7 +180,7 @@ def load_xlsx(file_path: str, rel_path: str) -> List[Document]:
                             "filename": filename,
                             "file_type": "xlsx",
                             "sheet": sheet_name,
-                            "equipment": equipment or "",
+                            "category": category or "",
                         },
                     )
                 )
@@ -195,7 +193,7 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
     """Extract tabular data from CSV files for knowledge retrieval."""
     docs = []
     filename = os.path.basename(file_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
 
     rows = []
     for enc in ("utf-8-sig", "utf-8", "latin-1", "cp1252"):
@@ -229,7 +227,7 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
                     "source": rel_path,
                     "filename": filename,
                     "file_type": "csv",
-                    "equipment": equipment or "",
+                    "category": category or "",
                 },
             )
         )
@@ -242,8 +240,8 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
         f"Total Rows: {len(data_rows)} records\n"
         f"Columns ({len(headers)}): {', '.join(headers)}\n"
     )
-    if equipment:
-        overview_content += f"Category / Tag: {equipment}\n"
+    if category:
+        overview_content += f"HR Category: {category}\n"
     docs.append(
         Document(
             page_content=overview_content.strip(),
@@ -251,7 +249,7 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
                 "source": rel_path,
                 "filename": filename,
                 "file_type": "csv",
-                "equipment": equipment or "",
+                "category": category or "",
                 "is_overview": True,
             },
         )
@@ -275,8 +273,8 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
             header_info = f"# CSV Document: {filename}"
             if total_chunks > 1:
                 header_info += f" (Part {chunk_idx + 1} of {total_chunks})"
-            if equipment:
-                header_info += f"\nCategory / Tag: {equipment}"
+            if category:
+                header_info += f"\nHR Category: {category}"
 
             content = f"{header_info}\nSource File: {filename}\n\n" + "\n".join(record_lines)
             docs.append(
@@ -286,7 +284,7 @@ def load_csv(file_path: str, rel_path: str) -> List[Document]:
                         "source": rel_path,
                         "filename": filename,
                         "file_type": "csv",
-                        "equipment": equipment or "",
+                        "category": category or "",
                     },
                 )
             )
@@ -301,7 +299,7 @@ def load_pptx(file_path: str, rel_path: str) -> List[Document]:
 
     prs = Presentation(file_path)
     filename = os.path.basename(file_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
 
     slide_texts = []
     for idx, slide in enumerate(prs.slides, start=1):
@@ -324,24 +322,24 @@ def load_pptx(file_path: str, rel_path: str) -> List[Document]:
                 "source": rel_path,
                 "filename": filename,
                 "file_type": "pptx",
-                "equipment": equipment or "",
+                "category": category or "",
             },
         )
     ]
 
 
 def load_image_stub(file_path: str, rel_path: str) -> List[Document]:
-    """Generate search context document for diagrams & graphic images."""
+    """Generate search context document for HR document images."""
     filename = os.path.basename(file_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
     ext = os.path.splitext(filename)[1].lower().replace(".", "")
 
-    content = f"# Diagram / Image: {filename}\n"
-    if equipment:
-        content += f"Category / Tag: {equipment}\n"
-    content += f"Type: Graphic / Diagram ({ext.upper()})\n"
+    content = f"# Document Image: {filename}\n"
+    if category:
+        content += f"HR Category: {category}\n"
+    content += f"Type: Document Image ({ext.upper()})\n"
     content += f"File Path: {rel_path}\n"
-    content += f"Description: Image or diagram for {equipment or filename}."
+    content += f"Description: Document image for {category or filename}."
 
     return [
         Document(
@@ -351,7 +349,7 @@ def load_image_stub(file_path: str, rel_path: str) -> List[Document]:
                 "filename": filename,
                 "file_type": ext,
                 "is_image": True,
-                "equipment": equipment or "",
+                "category": category or "",
             },
         )
     ]
@@ -362,7 +360,7 @@ def load_markdown(file_path: str, rel_path: str) -> List[Document]:
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
     filename = os.path.basename(file_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
     return [
         Document(
             page_content=content,
@@ -370,7 +368,7 @@ def load_markdown(file_path: str, rel_path: str) -> List[Document]:
                 "source": rel_path,
                 "filename": filename,
                 "file_type": "md",
-                "equipment": equipment or "",
+                "category": category or "",
             },
         )
     ]
@@ -417,7 +415,7 @@ def get_preview_text(full_path: str, rel_path: str) -> str:
     """Return text/markdown representation for previewing in UI."""
     ext = os.path.splitext(full_path)[1].lower()
     filename = os.path.basename(full_path)
-    equipment = extract_equipment_context(rel_path)
+    category = extract_policy_category(rel_path)
 
     if ext == ".md":
         with open(full_path, "r", encoding="utf-8") as f:
@@ -430,11 +428,11 @@ def get_preview_text(full_path: str, rel_path: str) -> str:
         pages = []
         for i, page in enumerate(doc_fitz):
             t = page.get_text("text").strip()
-            pages.append(f"### Page {i + 1}\n{t if t else '*(Visual drawing or non-text page)*'}")
+            pages.append(f"### Page {i + 1}\n{t if t else '*(No extractable text on this page)*'}")
         doc_fitz.close()
         header = f"# {filename}\n"
-        if equipment:
-            header += f"**Category / Tag:** {equipment}\n\n"
+        if category:
+            header += f"**HR Category:** {category}\n\n"
         return header + "\n\n---\n\n".join(pages)
 
     elif ext in (".xlsx", ".xls"):

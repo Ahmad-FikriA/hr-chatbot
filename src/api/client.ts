@@ -55,7 +55,7 @@ export interface DocItem {
   filename: string
   name: string
   file_type: string
-  equipment: string
+  category: string
 }
 
 export interface DocContent {
@@ -63,7 +63,7 @@ export interface DocContent {
   name: string
   file_type: string
   content: string
-  equipment: string
+  category: string
   total_pages?: number
 }
 
@@ -83,7 +83,7 @@ export interface UploadedDoc {
   filename: string
   name: string
   file_type: string
-  equipment: string
+  category: string
   size_bytes?: number
   chunk_count?: number
 }
@@ -106,7 +106,7 @@ export async function uploadFile(file: File): Promise<UploadedDoc> {
     filename: data.filename,
     name: data.filename,
     file_type: data.file_type,
-    equipment: 'My Uploads',
+    category: 'My Uploads',
     size_bytes: data.size_bytes,
     chunk_count: data.chunk_count,
   }

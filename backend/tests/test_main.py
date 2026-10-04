@@ -62,7 +62,7 @@ def test_docs_list():
         assert "filename" in first
         assert "name" in first
         assert "file_type" in first
-        assert "equipment" in first
+        assert "category" in first
 
 def test_docs_preview():
     """Test previewing a document if documents exist."""

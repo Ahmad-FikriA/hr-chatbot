@@ -42,7 +42,7 @@ from app.auth import (
     sign_token,
     verify_token
 )
-from app.loaders import load_all_documents, load_single_document, get_preview_text, extract_equipment_context, SUPPORTED_EXTENSIONS
+from app.loaders import load_all_documents, load_single_document, get_preview_text, extract_policy_category, SUPPORTED_EXTENSIONS
 
 # 1. Configuration & Directories
 LLM_BASE_URL = os.getenv("LLM_BASE_URL", "https://openrouter.ai/api/v1")
@@ -56,8 +56,9 @@ TOP_K = int(os.getenv("TOP_K", "8"))
 
 # Model prompts
 SYSTEM_PROMPT = """You are a helpful HR assistant for a company's internal knowledge base.
-Your job is to answer employee questions about company policies, benefits, leave entitlements, remote work rules, and any data or documents provided (including spreadsheets, datasets, and CSVs).
-Answer using the information found in the provided context. When asked to summarize, list, or analyze data from uploaded files (such as employee details, positions, departments, or metrics), provide complete and structured answers based on all records present in the context.
+Your job is to answer employee questions about company policies, benefits, leave entitlements, remote work rules, onboarding, and HR information in the provided documents.
+Answer using the information found in the provided context. When asked to summarize HR information from uploaded files, use only the records present in the context. Do not claim the retrieved excerpts cover the entire file.
+For questions unrelated to HR, briefly explain your scope and invite a question about workplace policies or HR documents.
 Reply in the SAME language as the user's question (English or Bahasa Indonesia).
 If the context contains both languages, prioritise the one the user used.
 If the answer is completely absent from the context, clearly state you don't have that information and suggest contacting HR.
@@ -164,12 +165,12 @@ def load_and_split_documents(knowledge_dir: str) -> list[Document]:
         else:
             raw_chunks.extend(text_splitter.split_documents([doc]))
     
-    # Context-enrich each chunk with document & equipment tags
+    # Context-enrich each chunk with document names and HR categories
     enriched_chunks = []
     for chunk in raw_chunks:
         fname = chunk.metadata.get("filename") or os.path.basename(chunk.metadata.get("source", ""))
-        equip = chunk.metadata.get("equipment", "")
-        header = f"[{fname}" + (f" | {equip}" if equip else "") + "]\n"
+        category = chunk.metadata.get("category", "")
+        header = f"[{fname}" + (f" | {category}" if category else "") + "]\n"
         if not chunk.page_content.startswith("["):
             chunk.page_content = header + chunk.page_content
         enriched_chunks.append(chunk)
@@ -362,12 +363,12 @@ async def list_docs(user: dict = Depends(get_current_user)):
                 if ext in SUPPORTED_EXTENSIONS:
                     abs_p = os.path.join(root, f)
                     rel_p = os.path.relpath(abs_p, KNOWLEDGE_DIR)
-                    equipment = extract_equipment_context(rel_p) or "General Documents"
+                    category = extract_policy_category(rel_p) or "HR Documents"
                     doc_items.append({
                         "filename": rel_p,
                         "name": f,
                         "file_type": ext.lstrip("."),
-                        "equipment": equipment
+                        "category": category
                     })
         return doc_items
     except Exception as e:
@@ -420,7 +421,7 @@ async def get_doc(filepath: str, user: dict = Depends(get_current_user)):
             "file_type": ext,
             "total_pages": total_pages,
             "content": preview,
-            "equipment": extract_equipment_context(filepath) or "General"
+            "category": extract_policy_category(filepath) or "HR Documents"
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Failed to read document preview: {e}")
@@ -591,7 +592,7 @@ async def list_uploaded_docs(user: dict = Depends(get_current_user)):
             "filename": fname,
             "name": fname,
             "file_type": ext,
-            "equipment": "My Uploads",
+            "category": "My Uploads",
             "size_bytes": os.path.getsize(fpath),
         })
     return items

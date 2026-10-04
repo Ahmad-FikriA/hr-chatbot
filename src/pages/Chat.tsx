@@ -146,13 +146,13 @@ export function Chat() {
     const filtered = docsList.filter(
       (d) =>
         d.name.toLowerCase().includes(query) ||
-        d.equipment.toLowerCase().includes(query) ||
+        d.category.toLowerCase().includes(query) ||
         d.filename.toLowerCase().includes(query)
     )
 
     const groups: Record<string, DocItem[]> = {}
     for (const doc of filtered) {
-      const groupKey = doc.equipment || 'General Documents'
+      const groupKey = doc.category || 'HR Documents'
       if (!groups[groupKey]) {
         groups[groupKey] = []
       }
@@ -209,7 +209,7 @@ export function Chat() {
         filename: filepath,
         name: parts[parts.length - 1],
         file_type: ext,
-        equipment: parts.length > 1 ? parts[0] : 'General',
+        category: parts.length > 1 ? parts[0] : 'HR Documents',
       })
     }
 
@@ -262,7 +262,7 @@ export function Chat() {
       </header>
 
       <div className="layout-body">
-        {/* Left Sidebar: List of files grouped by equipment */}
+        {/* Left Sidebar: List of files grouped by category */}
         <aside className={`sidebar ${sidebarOpen ? 'open' : 'collapsed'}`}>
           <div className="sidebar-header-search">
             <div className="sidebar-title">Policy Documents</div>
@@ -281,7 +281,7 @@ export function Chat() {
               Object.entries(groupedDocs).map(([group, items]) => (
                 <div key={group} className="sidebar-group">
                   <div className="sidebar-group-title" title={group}>
-                    {group.replace(/^Set_\d+_/, '')}
+                    {group}
                     <span className="sidebar-group-count">{items.length}</span>
                   </div>
                   {items.map((doc) => (
@@ -320,7 +320,7 @@ export function Chat() {
               }}
               role="button"
               tabIndex={0}
-              aria-label="Upload documents"
+              aria-label="Upload HR documents"
               onKeyDown={(e) => e.key === 'Enter' && uploadInputRef.current?.click()}
             >
               <input
@@ -344,7 +344,7 @@ export function Chat() {
               ) : (
                 <div className="upload-drop-inner">
                   <span className="upload-drop-icon">⬆️</span>
-                  <span className="upload-drop-label">Drop file or click to browse</span>
+                  <span className="upload-drop-label">Drop an HR document or click to browse</span>
                   <span className="upload-drop-hint">PDF · MD · XLSX · CSV · PPTX · max 20 MB</span>
                 </div>
               )}
@@ -446,7 +446,7 @@ export function Chat() {
                 className="composer-input"
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
-                placeholder="Ask about leave, benefits, BPJS, WFH policy, or upload a document to ask about it…"
+                placeholder="Ask about leave, benefits, BPJS, WFH policy, or upload an HR document to ask about it…"
                 aria-label="Your question"
                 autoFocus
               />
@@ -504,7 +504,7 @@ export function Chat() {
             ) : isImageFile && activePreviewPath ? (
               <div className="preview-image-container">
                 <div className="preview-image-header">
-                  P&ID Engineering Diagram
+                  HR Document Preview
                 </div>
                 <div 
                   className="preview-image-clickable-wrapper"
@@ -513,7 +513,7 @@ export function Chat() {
                 >
                   <img
                     src={getFileUrl(activePreviewPath)}
-                    alt={activeDocInfo?.name || 'Technical Diagram'}
+                    alt={activeDocInfo?.name || 'HR document image'}
                     className="preview-image-element clickable"
                   />
                   <div className="preview-image-overlay">
@@ -521,7 +521,7 @@ export function Chat() {
                   </div>
                 </div>
                 <p className="preview-image-caption">
-                  Click the diagram to open full-screen zoomable view, or use 'Open Original File' above.
+                  Click the image to open full-screen zoomable view, or use 'Open Original File' above.
                 </p>
               </div>
             ) : isPdfFile && activePreviewPath ? (
@@ -577,7 +577,7 @@ export function Chat() {
                           `${activeDocInfo?.name || prettySource(activePreviewPath)} (Page ${pdfPage})`
                         )
                       }
-                      title="Click to expand full-screen drawing"
+                      title="Click to expand full-screen page"
                     >
                       <img
                         key={`${activePreviewPath}-page-${pdfPage}`}
@@ -586,28 +586,28 @@ export function Chat() {
                         className="preview-image-element pdf-page-img clickable"
                       />
                       <div className="preview-image-overlay">
-                        <span>🔍 Click to expand full-screen drawing</span>
+                        <span>🔍 Click to expand full-screen page</span>
                       </div>
                     </div>
                     <p className="preview-image-caption">
-                      Click the drawing above for full-screen zoomable view, or use 'Open Original File' for the raw PDF.
+                      Click the page above for full-screen zoomable view, or use 'Open Original File' for the raw PDF.
                     </p>
                   </div>
                 ) : (
                   <MarkdownView
                     content={previewContent || ''}
-                    onImageClick={(src, alt) => openImageLightbox(src, alt || 'Diagram')}
+                    onImageClick={(src, alt) => openImageLightbox(src, alt || 'Document image')}
                   />
                 )}
               </div>
             ) : previewContent ? (
               <MarkdownView 
                 content={previewContent} 
-                onImageClick={(src, alt) => openImageLightbox(src, alt || 'Diagram')}
+                onImageClick={(src, alt) => openImageLightbox(src, alt || 'Document image')}
               />
             ) : (
               <div className="preview-empty">
-                Select a document in the left sidebar, or click a source chip in the chat to preview technical specs and diagrams.
+                Select a document in the left sidebar, or click a source chip in the chat to preview HR policies and documents.
               </div>
             )}
           </div>

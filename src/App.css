@@ -1191,7 +1191,7 @@
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
 }
 
-/* ============ PDF Visual Page & CAD Drawing Styles ============ */
+/* ============ PDF Page Preview Styles ============ */
 .preview-pdf-container {
   display: flex;
   flex-direction: column;
